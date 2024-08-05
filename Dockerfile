@@ -24,6 +24,18 @@ ENV MUJOCO_GL=egl
 # Requirements
 RUN pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
 RUN pip install elements hydra-core tensordict pandas tqdm gym torchrl
+RUN pip install termcolor
+ENV MUJOCO_EGL_DEVICE_ID=0
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    pkg-config \
+    libglvnd-dev \
+    libgl1-mesa-dev \
+    libegl1-mesa-dev \
+    libgles2-mesa-dev \
+    && apt-get clean
+
+ENV CUDA_VISIBLE_DEVICES=0
 
 # Source
 RUN mkdir /app

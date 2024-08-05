@@ -15,19 +15,19 @@ def missing_dependencies(task):
 
 try:
   from envs.dmcontrol import make_env as make_dm_control_env
-except:
+except ImportError:
   make_dm_control_env = missing_dependencies
 try:
   from envs.maniskill import make_env as make_maniskill_env
-except:
+except ImportError:
   make_maniskill_env = missing_dependencies
 try:
   from envs.metaworld import make_env as make_metaworld_env
-except:
+except ImportError:
   make_metaworld_env = missing_dependencies
 try:
   from envs.myosuite import make_env as make_myosuite_env
-except:
+except ImportError:
   make_myosuite_env = missing_dependencies
 
 

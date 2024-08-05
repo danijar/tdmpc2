@@ -62,4 +62,18 @@ def train(cfg: dict):
 
 
 if __name__ == '__main__':
+  import sys
+  import elements
+  args = elements.Flags(
+      task='dmc_walker_walk',
+      method='tdmpc2',
+      seed=0,
+      obs='rgb',
+      logdir='/dev/null',
+  ).parse()
+  sys.argv[1:] = [
+      f'task={args.task.split("_", 1)[1].replace("_", "-")}',
+      f'obs={args.obs}',
+      f'work_dir={args.logdir}',
+  ]
   train()
