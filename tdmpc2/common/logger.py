@@ -234,7 +234,8 @@ class Logger:
     if category == "eval" and self._save_csv:
       keys = ["step", "episode_reward"]
       self._eval.append(np.array([d[keys[0]], d[keys[1]]]))
-      pd.DataFrame(np.array(self._eval)).to_csv(
-        self._log_dir / "eval.csv", header=keys, index=None
-      )
+      # TODO
+      # pd.DataFrame(np.array(self._eval)).to_csv(
+      #   self._log_dir / "eval.csv", header=keys, index=None
+      # )
     self._print(d, category)

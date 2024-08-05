@@ -67,17 +67,17 @@ class SimNorm(nn.Module):
   Simplicial normalization.
   Adapted from https://arxiv.org/abs/2204.00616.
   """
-  
+
   def __init__(self, cfg):
     super().__init__()
     self.dim = cfg.simnorm_dim
-  
+
   def forward(self, x):
     shp = x.shape
     x = x.view(*shp[:-1], -1, self.dim)
     x = F.softmax(x, dim=-1)
     return x.view(*shp)
-    
+
   def __repr__(self):
     return f"SimNorm(dim={self.dim})"
 
@@ -98,7 +98,7 @@ class NormedLinear(nn.Linear):
     if self.dropout:
       x = self.dropout(x)
     return self.act(self.ln(x))
-  
+
   def __repr__(self):
     repr_dropout = f", dropout={self.dropout.p}" if self.dropout else ""
     return f"NormedLinear(in_features={self.in_features}, "\
