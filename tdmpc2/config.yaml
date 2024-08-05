@@ -1,5 +1,5 @@
-defaults:
-    - override hydra/launcher: submitit_local
+# defaults:
+#     - override hydra/launcher: submitit_local
 
 # environment
 task: dog-run
