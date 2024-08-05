@@ -1,6 +1,9 @@
-from copy import deepcopy
+import json
+import time
 import warnings
+from copy import deepcopy
 
+import elements
 import gym
 
 from envs.wrappers.multitask import MultitaskWrapper
@@ -50,7 +53,7 @@ def make_multitask_env(cfg):
   cfg.action_dims = env._action_dims
   cfg.episode_lengths = env._episode_lengths
   return env
-  
+
 
 def make_env(cfg):
   """
@@ -58,6 +61,7 @@ def make_env(cfg):
   """
   gym.logger.set_level(40)
   if cfg.multitask:
+    assert False  # TODO
     env = make_multitask_env(cfg)
 
   else:
@@ -69,14 +73,54 @@ def make_env(cfg):
         pass
     if env is None:
       raise ValueError(f'Failed to make environment "{cfg.task}": please verify that dependencies are installed and that the task exists.')
+
+    # This works because TD-MPC2 uses only a single env instance.
+    env = LoggingWrapper(env, cfg.work_dir)
+
     env = TensorWrapper(env)
   if cfg.get('obs', 'state') == 'rgb':
     env = PixelWrapper(cfg, env)
   try: # Dict
     cfg.obs_shape = {k: v.shape for k, v in env.observation_space.spaces.items()}
-  except: # Box
+  except Exception: # Box
     cfg.obs_shape = {cfg.get('obs', 'state'): env.observation_space.shape}
   cfg.action_dim = env.action_space.shape[0]
   cfg.episode_length = env.max_episode_steps
   cfg.seed_steps = max(1000, 5*cfg.episode_length)
   return env
+
+
+class LoggingWrapper:
+
+  def __init__(self, env, logdir):
+    self.env = env
+    logdir = elements.Path(logdir)
+    logdir.mkdir()
+    self.filename = logdir / 'scores.jsonl'
+    self.score = 0.0
+    self.total = 0
+    self.start = time.time()
+
+  @property
+  def unwrapped(self):
+    return self.env
+
+  def __getattr__(self, name):
+    return getattr(self.env, name)
+
+  def reset(self):
+    self.score = 0.0
+    self.total += 1
+    return self.env.reset()
+
+  def step(self, action):
+    self.total += 1
+    obs, rew, last, info = self.env.step(action)
+    self.score += float(rew)  # TODO
+    if last:
+      mins = round((time.time() - self.start) / 60, 1)
+      print('episode done!', self.total, mins, self.score, flush=True)
+      with self.filename.open('a') as f:
+        f.write(json.dumps({'xs': self.total, 'ys': self.score}) + '\n')
+      # self.output([(self.total, 'episode/score', self.score)])
+    return obs, rew, last, info

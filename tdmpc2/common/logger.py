@@ -107,9 +107,9 @@ class Logger:
 
   def __init__(self, cfg):
     self._log_dir = make_dir(cfg.work_dir)
-    self._model_dir = make_dir(self._log_dir / "models")
+    self._model_dir = None  # make_dir(self._log_dir / "models")
     self._save_csv = cfg.save_csv
-    self._save_agent = cfg.save_agent
+    self._save_agent = False  # cfg.save_agent
     self._group = cfg_to_group(cfg)
     self._seed = cfg.seed
     self._eval = []
@@ -151,25 +151,25 @@ class Logger:
   def model_dir(self):
     return self._model_dir
 
-  def save_agent(self, agent=None, identifier='final'):
-    if self._save_agent and agent:
-      fp = self._model_dir / f'{str(identifier)}.pt'
-      agent.save(fp)
-      if self._wandb:
-        artifact = self._wandb.Artifact(
-          self._group + '-' + str(self._seed) + '-' + str(identifier),
-          type='model',
-        )
-        artifact.add_file(fp)
-        self._wandb.log_artifact(artifact)
+  # def save_agent(self, agent=None, identifier='final'):
+  #   if self._save_agent and agent:
+  #     fp = self._model_dir / f'{str(identifier)}.pt'
+  #     agent.save(fp)
+  #     if self._wandb:
+  #       artifact = self._wandb.Artifact(
+  #         self._group + '-' + str(self._seed) + '-' + str(identifier),
+  #         type='model',
+  #       )
+  #       artifact.add_file(fp)
+  #       self._wandb.log_artifact(artifact)
 
-  def finish(self, agent=None):
-    try:
-      self.save_agent(agent)
-    except Exception as e:
-      print(colored(f"Failed to save model: {e}", "red"))
-    if self._wandb:
-      self._wandb.finish()
+  # def finish(self, agent=None):
+  #   try:
+  #     self.save_agent(agent)
+  #   except Exception as e:
+  #     print(colored(f"Failed to save model: {e}", "red"))
+  #   if self._wandb:
+  #     self._wandb.finish()
 
   def _format(self, key, value, ty):
     if ty == "int":

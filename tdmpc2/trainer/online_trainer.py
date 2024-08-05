@@ -24,28 +24,28 @@ class OnlineTrainer(Trainer):
       total_time=time() - self._start_time,
     )
 
-  def eval(self):
-    """Evaluate a TD-MPC2 agent."""
-    ep_rewards, ep_successes = [], []
-    for i in range(self.cfg.eval_episodes):
-      obs, done, ep_reward, t = self.env.reset(), False, 0, 0
-      if self.cfg.save_video:
-        self.logger.video.init(self.env, enabled=(i==0))
-      while not done:
-        action = self.agent.act(obs, t0=t==0, eval_mode=True)
-        obs, reward, done, info = self.env.step(action)
-        ep_reward += reward
-        t += 1
-        if self.cfg.save_video:
-          self.logger.video.record(self.env)
-      ep_rewards.append(ep_reward)
-      ep_successes.append(info['success'])
-      if self.cfg.save_video:
-        self.logger.video.save(self._step)
-    return dict(
-      episode_reward=np.nanmean(ep_rewards),
-      episode_success=np.nanmean(ep_successes),
-    )
+  # def eval(self):
+  #   """Evaluate a TD-MPC2 agent."""
+  #   ep_rewards, ep_successes = [], []
+  #   for i in range(self.cfg.eval_episodes):
+  #     obs, done, ep_reward, t = self.env.reset(), False, 0, 0
+  #     if self.cfg.save_video:
+  #       self.logger.video.init(self.env, enabled=(i==0))
+  #     while not done:
+  #       action = self.agent.act(obs, t0=t==0, eval_mode=True)
+  #       obs, reward, done, info = self.env.step(action)
+  #       ep_reward += reward
+  #       t += 1
+  #       if self.cfg.save_video:
+  #         self.logger.video.record(self.env)
+  #     ep_rewards.append(ep_reward)
+  #     ep_successes.append(info['success'])
+  #     if self.cfg.save_video:
+  #       self.logger.video.save(self._step)
+  #   return dict(
+  #     episode_reward=np.nanmean(ep_rewards),
+  #     episode_success=np.nanmean(ep_successes),
+  #   )
 
   def to_td(self, obs, action=None, reward=None):
     """Creates a TensorDict for a new episode."""
@@ -69,17 +69,19 @@ class OnlineTrainer(Trainer):
     train_metrics, done, eval_next = {}, True, True
     while self._step <= self.cfg.steps:
 
-      # Evaluate agent periodically
-      if self._step % self.cfg.eval_freq == 0:
-        eval_next = True
+      # # Evaluate agent periodically
+      # if self._step % self.cfg.eval_freq == 0:
+      #   eval_next = True
 
       # Reset environment
       if done:
-        if eval_next:
-          eval_metrics = self.eval()
-          eval_metrics.update(self.common_metrics())
-          self.logger.log(eval_metrics, 'eval')
-          eval_next = False
+
+        # TODO
+        # if eval_next:
+        #   eval_metrics = self.eval()
+        #   eval_metrics.update(self.common_metrics())
+        #   self.logger.log(eval_metrics, 'eval')
+        #   eval_next = False
 
         if self._step > 0:
           train_metrics.update(
@@ -113,5 +115,5 @@ class OnlineTrainer(Trainer):
         train_metrics.update(_train_metrics)
 
       self._step += 1
-  
-    self.logger.finish(self.agent)
+
+    # self.logger.finish(self.agent)

@@ -129,7 +129,7 @@ class TDMPC2:
     z = z.repeat(self.cfg.num_samples, 1)
     mean = torch.zeros(self.cfg.horizon, self.cfg.action_dim, device=self.device)
     std = self.cfg.max_std*torch.ones(self.cfg.horizon, self.cfg.action_dim, device=self.device)
-    if not t0:
+    if not t0 and hasattr(self, '_prev_mean'):
       mean[:-1] = self._prev_mean[1:]
     actions = torch.empty(self.cfg.horizon, self.cfg.num_samples, self.cfg.action_dim, device=self.device)
     if self.cfg.num_pi_trajs > 0:

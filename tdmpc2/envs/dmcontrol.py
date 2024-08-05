@@ -181,21 +181,6 @@ class TimeStepToGymWrapper:
     return self.env.physics.render(height, width, camera_id)
 
 
-class LoggingWrapper:
-
-  def __init__(self, env, filepath):
-    self.env = env
-
-  def reset(self):
-    # TODO
-    return self.env.reset()
-
-  def step(self, action):
-    # TODO
-    obs, rew, last, info = self.env.step(action)
-    return obs, rew, last, info
-
-
 def make_env(cfg):
   """
   Make DMControl environment.
@@ -216,9 +201,4 @@ def make_env(cfg):
   env = action_scale.Wrapper(env, minimum=-1., maximum=1.)
   env = ExtendedTimeStepWrapper(env)
   env = TimeStepToGymWrapper(env, domain, task)
-
-  import elements
-  path = elements.Path(cfg.work_dir / 'metrics.jsonl')
-  env = LoggingWrapper(env, path)
-
   return env

@@ -35,7 +35,7 @@ class WorldModel(nn.Module):
   @property
   def total_params(self):
     return sum(p.numel() for p in self.parameters() if p.requires_grad)
-    
+
   def to(self, *args, **kwargs):
     """
     Overriding `to` method to also move additional tensors to device.
@@ -46,7 +46,7 @@ class WorldModel(nn.Module):
     self.log_std_min = self.log_std_min.to(*args, **kwargs)
     self.log_std_dif = self.log_std_dif.to(*args, **kwargs)
     return self
-  
+
   def train(self, mode=True):
     """
     Overriding `train` method to keep target Q-networks in eval mode.
@@ -74,7 +74,7 @@ class WorldModel(nn.Module):
     with torch.no_grad():
       for p, p_target in zip(self._Qs.parameters(), self._target_Qs.parameters()):
         p_target.data.lerp_(p.data, self.cfg.tau)
-  
+
   def task_emb(self, x, task):
     """
     Continuous task embedding for multi-task experiments.
@@ -109,7 +109,7 @@ class WorldModel(nn.Module):
       z = self.task_emb(z, task)
     z = torch.cat([z, a], dim=-1)
     return self._dynamics(z)
-  
+
   def reward(self, z, a, task):
     """
     Predicts instantaneous (single-step) reward.
@@ -160,7 +160,7 @@ class WorldModel(nn.Module):
 
     if self.cfg.multitask:
       z = self.task_emb(z, task)
-      
+
     z = torch.cat([z, a], dim=-1)
     out = (self._target_Qs if target else self._Qs)(z)
 
