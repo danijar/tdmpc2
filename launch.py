@@ -41,12 +41,12 @@ DMC18 = [
     'dmc_finger_turn_easy', 'dmc_reacher_easy', 'dmc_walker_stand',
 ]
 
-runs = Runs({'jobs': jobs})
-runs.rgb = {'obs': 'rgb'}
-runs.times(task=DMC20, seed=range(3))
-launch(runs, 'tdmpc2_rgb', alloc='dm/gdm-worldmodels-gcp', tbdir='')
-
 # runs = Runs({'jobs': jobs})
-# runs.states = {'obs': 'states'}
+# runs.rgb = {'obs': 'rgb'}
 # runs.times(task=DMC20, seed=range(3))
-# launch(runs, 'tdmpc2_states', alloc='dm/gdm-worldmodels-gcp', tbdir='')
+# launch(runs, 'tdmpc2_rgb', alloc='dm/gdm-worldmodels-gcp', tbdir='')
+
+runs = Runs({'jobs': jobs})
+runs.state = {'obs': 'state'}
+runs.times(task=DMC18, seed=range(3))
+launch(runs, 'tdmpc2_state', alloc='dm/gdm-worldmodels-gcp', tbdir='')
